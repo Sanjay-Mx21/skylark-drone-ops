@@ -1,9 +1,8 @@
 """
 Skylark Drones - AI Agent
-Uses Google Gemini to provide a conversational interface for drone operations coordination.
-Interprets user queries, calls appropriate data_engine functions, and returns natural language responses.
+Uses Groq (LLaMA) to provide a conversational interface for drone operations coordination.
 """
-import google.generativeai as genai
+from groq import Groq
 import json
 import re
 from data_engine import (
@@ -43,7 +42,7 @@ Rules:
 - Always use actual data provided. Never make up data.
 - When matching, explain WHY a candidate is good or bad.
 - Flag any conflicts or risks proactively.
-- For cost calculations, show the math: rate × days = total.
+- For cost calculations, show the math: rate x days = total.
 - Be concise but thorough. Use tables/bullet points for clarity.
 - If an action would cause a conflict, WARN the user before proceeding.
 - When you give an action block, also explain what you're doing in natural language.
@@ -51,15 +50,21 @@ Rules:
 
 
 def get_agent_response(api_key, user_message, data_context, chat_history=None):
-    """Get a response from the Gemini AI agent."""
+    """Get a response from the Groq AI agent."""
     try:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(
-            "gemini-2.0-flash",
-            system_instruction=SYSTEM_PROMPT
-        )
+        client = Groq(api_key=api_key)
 
-        # Build conversation with data context
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+        # Add chat history
+        if chat_history:
+            for msg in chat_history:
+                role = msg.get("role", "user")
+                if role == "model":
+                    role = "assistant"
+                messages.append({"role": role, "content": msg.get("content", msg.get("parts", [""])[0] if "parts" in msg else "")})
+
+        # Add current message with data context
         full_prompt = f"""
 CURRENT LIVE DATA:
 {data_context}
@@ -68,17 +73,19 @@ USER MESSAGE: {user_message}
 
 Respond helpfully. If the user wants to take an action, include the action JSON block.
 """
-        # Use chat history if available
-        if chat_history:
-            chat = model.start_chat(history=chat_history)
-            response = chat.send_message(full_prompt)
-        else:
-            response = model.generate_content(full_prompt)
+        messages.append({"role": "user", "content": full_prompt})
 
-        return response.text
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            temperature=0.3,
+            max_tokens=2048,
+        )
+
+        return response.choices[0].message.content
 
     except Exception as e:
-        return f"❌ AI Error: {str(e)}. Please check your Gemini API key."
+        return f"❌ AI Error: {str(e)}. Please check your Groq API key."
 
 
 def parse_action(response_text):
