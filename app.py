@@ -118,7 +118,7 @@ with st.sidebar:
     st.divider()
 
     # API Key
-    api_key = st.text_input("🔑 Gemini API Key", type="password", 
+    api_key = st.text_input("🔑 Gemini API Key", type="password",value=st.secrets.get("gemini_api_key", ""), 
                             help="Get free key at aistudio.google.com/app/apikey")
     
     st.divider()
