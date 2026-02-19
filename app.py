@@ -38,30 +38,13 @@ st.set_page_config(
 st.markdown("""
 <style>
     .stApp {
-        background-color: #0e1117;
-    }
-    .status-available { color: #00cc66; font-weight: bold; }
-    .status-assigned { color: #ff9900; font-weight: bold; }
-    .status-leave { color: #ff4444; font-weight: bold; }
-    .status-maintenance { color: #ff4444; font-weight: bold; }
-    .conflict-card {
-        background: #1a1a2e;
-        border-left: 4px solid #ff4444;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 4px;
-    }
-    .success-card {
-        background: #1a2e1a;
-        border-left: 4px solid #00cc66;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 4px;
+        background-color: #0a0e17;
     }
     div[data-testid="stMetric"] {
-        background-color: #1a1a2e;
+        background-color: #111827;
         padding: 15px;
         border-radius: 8px;
+        border: 1px solid #1e293b;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -106,7 +89,7 @@ def sync_to_sheets_if_connected(entity_type=None, entity_id=None, new_status=Non
             pilots, drones, missions = get_data()
             full_sync_to_sheets(client, sheet_id, pilots, drones, missions)
     except Exception as e:
-        st.toast(f"Sheets sync note: {e}", icon="⚠️")
+        st.toast(f"Sheets sync note: {e}")
 
 
 # ─── SIDEBAR ─────────────────────────────────────────────────────────
@@ -118,20 +101,20 @@ with st.sidebar:
     st.divider()
 
     # API Key
-    api_key = st.text_input("🔑 Groq API Key", type="password",value=st.secrets.get("groq_api_key", ""), 
+    api_key = st.text_input("Groq API Key", type="password", value=st.secrets.get("groq_api_key", ""),
                             help="Get free key at console.groq.com")
-    
+
     st.divider()
 
     # Google Sheets Config
-    st.subheader("📊 Google Sheets Sync")
+    st.subheader("Google Sheets Sync")
     if SHEETS_AVAILABLE:
         try:
             sheet_id = st.secrets.get("spreadsheet_id", "")
             if sheet_id:
-                st.success("✅ Sheets connected")
+                st.success("Sheets connected")
                 st.session_state.sheets_connected = True
-                if st.button("🔄 Sync from Sheets"):
+                if st.button("Sync from Sheets"):
                     client = get_gspread_client()
                     if client:
                         p, d, m = load_data_from_sheets(client, sheet_id)
@@ -139,7 +122,7 @@ with st.sidebar:
                             save_data(p, d, m)
                             st.success("Loaded from Sheets!")
                             st.rerun()
-                if st.button("📤 Push to Sheets"):
+                if st.button("Push to Sheets"):
                     sync_to_sheets_if_connected("full")
                     st.success("Pushed to Sheets!")
             else:
@@ -152,18 +135,18 @@ with st.sidebar:
     st.divider()
 
     # Quick actions
-    st.subheader("⚡ Quick Actions")
-    if st.button("🔍 Run Conflict Check", use_container_width=True):
+    st.subheader("Quick Actions")
+    if st.button("Run Conflict Check", use_container_width=True):
         pilots, drones, missions = get_data()
         conflicts = detect_all_conflicts(pilots, drones, missions)
         st.session_state.last_conflicts = conflicts
 
-    if st.button("🔧 Check Maintenance", use_container_width=True):
+    if st.button("Check Maintenance", use_container_width=True):
         _, drones, _ = get_data()
         issues = flag_maintenance_issues(drones)
         st.session_state.last_maintenance = issues
 
-    if st.button("🔄 Reset Data", use_container_width=True):
+    if st.button("Reset Data", use_container_width=True):
         pilots, drones, missions = load_data()
         save_data(pilots, drones, missions)
         st.session_state.chat_history = []
@@ -180,24 +163,24 @@ tab_chat, tab_dashboard, tab_pilots, tab_drones, tab_missions = st.tabs(
 # ─── TAB: AI CHAT ────────────────────────────────────────────────────
 
 with tab_chat:
-    st.header("💬 SkyOps AI Coordinator")
+    st.header("SkyOps AI Coordinator")
     st.caption("Ask me anything about pilots, drones, missions, assignments, or conflicts!")
 
     # Example prompts
-    with st.expander("💡 Example queries you can try"):
+    with st.expander("Example queries you can try"):
         st.markdown("""
-- "Show me all available pilots in Bangalore"
-- "Which drones can fly in rainy conditions?"
-- "Match the best pilot for PRJ001"
-- "What's the cost of assigning Arjun to PRJ001?"
-- "Run a full conflict check"
-- "Assign P001 to PRJ001"
-- "Set P004 status to Available"
-- "Find urgent reassignment options for PRJ002"
-- "Which drone should we use for PRJ003?"
-- "Show all current assignments"
-- "Is P003 qualified for PRJ002?"
-- "Flag any maintenance issues"
+- Show me all available pilots in Bangalore
+- Which drones can fly in rainy conditions?
+- Match the best pilot for PRJ001
+- What's the cost of assigning Arjun to PRJ001?
+- Run a full conflict check
+- Assign P001 to PRJ001
+- Set P004 status to Available
+- Find urgent reassignment options for PRJ002
+- Which drone should we use for PRJ003?
+- Show all current assignments
+- Is P003 qualified for PRJ002?
+- Flag any maintenance issues
         """)
 
     # Chat container with scrollable history
@@ -214,21 +197,21 @@ with tab_chat:
             st.markdown(user_input)
 
         if not api_key:
-            response = "⚠️ Please enter your Gemini API key in the sidebar to use the AI chat. You can get a free key at [aistudio.google.com](https://aistudio.google.com/app/apikey)."
+            response = "Please enter your Groq API key in the sidebar to use the AI chat. You can get a free key at [console.groq.com](https://console.groq.com)."
         else:
             pilots, drones, missions = get_data()
             data_context = get_full_summary(pilots, drones, missions)
 
-            with st.spinner("🤖 SkyOps AI is thinking..."):
-                # Build Gemini chat history format
-                gemini_history = []
-                for msg in st.session_state.chat_history[:-1]:  # exclude current
-                    gemini_history.append({
+            with st.spinner("SkyOps AI is thinking..."):
+                # Build chat history format
+                history = []
+                for msg in st.session_state.chat_history[:-1]:
+                    history.append({
                         "role": "user" if msg["role"] == "user" else "model",
                         "parts": [msg["content"]]
                     })
 
-                response = get_agent_response(api_key, user_input, data_context, gemini_history)
+                response = get_agent_response(api_key, user_input, data_context, history)
 
             # Check for actions in response
             action = parse_action(response)
@@ -251,7 +234,7 @@ with tab_chat:
                     assignment = action.get("args", {}).get("project_id")
                     sync_to_sheets_if_connected("drone", drone_id, new_status, assignment)
 
-                response += f"\n\n---\n🔧 **Action Executed:** {action_msg}"
+                response += f"\n\n---\n**Action Executed:** {action_msg}"
 
         st.session_state.chat_history.append({"role": "assistant", "content": response})
         with st.chat_message("assistant"):
@@ -260,7 +243,7 @@ with tab_chat:
 # ─── TAB: DASHBOARD ──────────────────────────────────────────────────
 
 with tab_dashboard:
-    st.header("📊 Operations Dashboard")
+    st.header("Operations Dashboard")
     pilots, drones, missions = get_data()
 
     # KPIs
@@ -284,40 +267,42 @@ with tab_dashboard:
     # Conflicts
     col_left, col_right = st.columns(2)
     with col_left:
-        st.subheader("⚠️ Conflict Report")
+        st.subheader("Conflict Report")
         if hasattr(st.session_state, "last_conflicts"):
             for c in st.session_state.last_conflicts:
-                if c.startswith("✅"):
-                    st.success(c)
-                elif "🔴" in c:
+                if "No conflicts" in c:
+                    st.success("No conflicts detected across all missions.")
+                elif "MISMATCH" in c or "OVERRUN" in c or "DOUBLE" in c or "MAINTENANCE" in c or "WEATHER" in c:
                     st.error(c)
                 else:
                     st.warning(c)
         else:
             for c in conflicts:
-                if c.startswith("✅"):
-                    st.success(c)
-                elif "🔴" in c:
+                if "No conflicts" in c:
+                    st.success("No conflicts detected across all missions.")
+                elif "MISMATCH" in c or "OVERRUN" in c or "DOUBLE" in c or "MAINTENANCE" in c or "WEATHER" in c:
                     st.error(c)
                 else:
                     st.warning(c)
 
     with col_right:
-        st.subheader("🔧 Maintenance Alerts")
+        st.subheader("Maintenance Alerts")
         maint = flag_maintenance_issues(drones)
         for m in maint:
-            if m.startswith("✅"):
-                st.success(m)
-            elif "⚠️" in m:
+            if "No maintenance" in m:
+                st.success("No maintenance issues flagged.")
+            elif "OVERDUE" in m:
                 st.error(m)
-            else:
+            elif "due soon" in m:
                 st.warning(m)
+            else:
+                st.info(m)
 
     st.divider()
 
     # Action Log
     if st.session_state.action_log:
-        st.subheader("📝 Action Log")
+        st.subheader("Action Log")
         for log in reversed(st.session_state.action_log[-10:]):
             st.info(log)
 
@@ -325,7 +310,7 @@ with tab_dashboard:
 # ─── TAB: PILOTS ─────────────────────────────────────────────────────
 
 with tab_pilots:
-    st.header("👨‍✈️ Pilot Roster")
+    st.header("Pilot Roster")
     pilots, drones, missions = get_data()
 
     # Filters
@@ -348,7 +333,7 @@ with tab_pilots:
     st.dataframe(filtered, use_container_width=True, hide_index=True)
 
     # Update Status
-    st.subheader("✏️ Update Pilot Status")
+    st.subheader("Update Pilot Status")
     col1, col2, col3 = st.columns(3)
     with col1:
         pid = st.selectbox("Select Pilot", pilots["pilot_id"].tolist(),
@@ -365,7 +350,7 @@ with tab_pilots:
             st.rerun()
 
     # Cost Calculator
-    st.subheader("💰 Cost Calculator")
+    st.subheader("Cost Calculator")
     col1, col2, col3 = st.columns(3)
     with col1:
         cost_pid = st.selectbox("Pilot", pilots["pilot_id"].tolist(), key="cost_pilot",
@@ -379,15 +364,15 @@ with tab_pilots:
             if total:
                 budget = m["mission_budget_inr"]
                 if total > budget:
-                    st.error(f"{msg}\n⚠️ OVER BUDGET by ₹{total - budget} (budget: ₹{budget})")
+                    st.error(f"{msg} — OVER BUDGET by Rs.{total - budget} (budget: Rs.{budget})")
                 else:
-                    st.success(f"{msg}\n✅ Within budget (₹{budget})")
+                    st.success(f"{msg} — Within budget (Rs.{budget})")
 
 
 # ─── TAB: DRONES ─────────────────────────────────────────────────────
 
 with tab_drones:
-    st.header("🛩️ Drone Fleet")
+    st.header("Drone Fleet")
     pilots, drones, missions = get_data()
 
     col1, col2 = st.columns(2)
@@ -405,7 +390,7 @@ with tab_drones:
     st.dataframe(filtered_d, use_container_width=True, hide_index=True)
 
     # Update Status
-    st.subheader("✏️ Update Drone Status")
+    st.subheader("Update Drone Status")
     col1, col2, col3 = st.columns(3)
     with col1:
         did = st.selectbox("Select Drone", drones["drone_id"].tolist(),
@@ -422,18 +407,18 @@ with tab_drones:
             st.rerun()
 
     # Weather Compatibility
-    st.subheader("🌧️ Weather Compatibility")
+    st.subheader("Weather Compatibility")
     for _, d in drones.iterrows():
         if "ip43" in d["weather_resistance"].lower():
-            st.success(f"✅ {d['drone_id']} ({d['model']}) - Rain rated ({d['weather_resistance']})")
+            st.success(f"{d['drone_id']} ({d['model']}) — Rain rated ({d['weather_resistance']})")
         else:
-            st.warning(f"⚠️ {d['drone_id']} ({d['model']}) - Clear sky only ({d['weather_resistance']})")
+            st.warning(f"{d['drone_id']} ({d['model']}) — Clear sky only ({d['weather_resistance']})")
 
 
 # ─── TAB: MISSIONS ───────────────────────────────────────────────────
 
 with tab_missions:
-    st.header("📌 Missions")
+    st.header("Missions")
     pilots, drones, missions = get_data()
 
     st.dataframe(missions, use_container_width=True, hide_index=True)
@@ -441,36 +426,47 @@ with tab_missions:
     st.divider()
 
     # Mission Matching
-    st.subheader("🎯 Smart Assignment Matching")
+    st.subheader("Smart Assignment Matching")
     selected_mission = st.selectbox("Select Mission", missions["project_id"].tolist(),
                                      format_func=lambda x: f"{x} - {missions[missions['project_id']==x]['client'].values[0]} ({missions[missions['project_id']==x]['location'].values[0]})")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("**👨‍✈️ Pilot Matches**")
+        st.markdown("**Pilot Matches**")
         if st.button("Find Best Pilots"):
             candidates, msg = match_pilots_to_mission(pilots, missions, selected_mission)
             for c in candidates:
-                icon = "✅" if "Perfect" in c["fit"] else ("⚠️" if "Partial" in c["fit"] else "❌")
+                fit_label = c["fit"].replace("✅ ", "").replace("⚠️ ", "").replace("❌ ", "")
+                if "Perfect" in c["fit"]:
+                    prefix = "[PERFECT]"
+                elif "Partial" in c["fit"]:
+                    prefix = "[PARTIAL]"
+                else:
+                    prefix = "[POOR]"
                 issues = ", ".join(c["issues"]) if c["issues"] else "No issues"
-                st.markdown(f"{icon} **{c['name']}** ({c['pilot_id']}) - {c['fit']} - ₹{c['total_cost']}")
-                st.caption(f"  Issues: {issues}")
+                st.markdown(f"{prefix} **{c['name']}** ({c['pilot_id']}) — Rs.{c['total_cost']}")
+                st.caption(f"Issues: {issues}")
 
     with col2:
-        st.markdown("**🛩️ Drone Matches**")
+        st.markdown("**Drone Matches**")
         if st.button("Find Best Drones"):
             candidates, msg = match_drones_to_mission(drones, missions, selected_mission)
             for c in candidates:
-                icon = "✅" if "Perfect" in c["fit"] else ("⚠️" if "Partial" in c["fit"] else "❌")
+                if "Perfect" in c["fit"]:
+                    prefix = "[PERFECT]"
+                elif "Partial" in c["fit"]:
+                    prefix = "[PARTIAL]"
+                else:
+                    prefix = "[POOR]"
                 issues = ", ".join(c["issues"]) if c["issues"] else "No issues"
-                st.markdown(f"{icon} **{c['model']}** ({c['drone_id']}) - {c['fit']}")
-                st.caption(f"  Issues: {issues}")
+                st.markdown(f"{prefix} **{c['model']}** ({c['drone_id']})")
+                st.caption(f"Issues: {issues}")
 
     st.divider()
 
     # Direct Assignment
-    st.subheader("📋 Quick Assign")
+    st.subheader("Quick Assign")
     col1, col2, col3 = st.columns(3)
     with col1:
         assign_mission = st.selectbox("Mission", missions["project_id"].tolist(), key="assign_m")
@@ -498,15 +494,15 @@ with tab_missions:
 
         # Auto conflict check after assignment
         conflicts = detect_all_conflicts(pilots, drones, missions)
-        real_conflicts = [c for c in conflicts if not c.startswith("✅")]
+        real_conflicts = [c for c in conflicts if "No conflicts" not in c]
         if real_conflicts:
-            st.warning("⚠️ Conflicts detected after assignment:")
+            st.warning("Conflicts detected after assignment:")
             for c in real_conflicts:
                 st.error(c)
 
     # Urgent Reassignment
     st.divider()
-    st.subheader("🚨 Urgent Reassignment")
+    st.subheader("Urgent Reassignment")
     reassign_mission = st.selectbox("Mission needing reassignment", missions["project_id"].tolist(), key="reassign_m")
     if st.button("Generate Reassignment Plan", type="secondary"):
         result = find_urgent_reassignment(pilots, drones, missions, reassign_mission)
