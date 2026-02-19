@@ -122,8 +122,8 @@ with st.sidebar:
     st.divider()
 
     # API Key
-    api_key = st.text_input("Groq API Key", type="password", value=st.secrets.get("groq_api_key", ""),
-                            help="Get free key at console.groq.com")
+    # api_key = st.text_input("Groq API Key", type="password", value=st.secrets.get("groq_api_key", ""),
+    #                         help="Get free key at console.groq.com")
 
     # st.divider()
 
