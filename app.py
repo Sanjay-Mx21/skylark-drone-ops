@@ -46,6 +46,13 @@ st.markdown("""
         border-radius: 8px;
         border: 1px solid #1e293b;
     }
+    .stChatInput {
+        position: fixed;
+        bottom: 0;
+        z-index: 999;
+        background-color: #0a0e17;
+        padding: 10px 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
