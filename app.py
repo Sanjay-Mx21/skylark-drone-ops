@@ -124,6 +124,8 @@ with st.sidebar:
     # API Key
     # api_key = st.text_input("Groq API Key", type="password", value=st.secrets.get("groq_api_key", ""),
     #                         help="Get free key at console.groq.com")
+    # ✅ ADD THIS INSTEAD:
+    api_key = st.secrets.get("groq_api_key", "")
 
     # st.divider()
 
