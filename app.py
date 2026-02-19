@@ -200,10 +200,12 @@ with tab_chat:
 - "Flag any maintenance issues"
         """)
 
-    # Chat display
-    for msg in st.session_state.chat_history:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+    # Chat container with scrollable history
+    chat_container = st.container(height=500)
+    with chat_container:
+        for msg in st.session_state.chat_history:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
 
     # Chat input
     if user_input := st.chat_input("Ask SkyOps AI..."):
