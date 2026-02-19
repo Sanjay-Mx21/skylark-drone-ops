@@ -48,10 +48,24 @@ st.markdown("""
     }
     .stChatInput {
         position: fixed;
-        bottom: 0;
+        bottom: 20px;
         z-index: 999;
-        background-color: #0a0e17;
+        background: rgba(10, 14, 23, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         padding: 10px 0;
+        border-radius: 12px;
+    }
+    .stChatInput > div {
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 12px !important;
+        background: rgba(17, 24, 39, 0.6) !important;
+        backdrop-filter: blur(10px) !important;
+        transition: border-color 0.3s ease;
+    }
+    .stChatInput > div:hover, .stChatInput > div:focus-within {
+        border-color: #00BCD4 !important;
+        box-shadow: 0 0 15px rgba(0, 188, 212, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
