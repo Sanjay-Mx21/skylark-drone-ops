@@ -2,8 +2,7 @@
 
 An AI-powered drone operations coordinator built for Skylark Drones. It manages pilot rosters, drone fleets, mission assignments, and detects conflicts — all through a conversational interface.
 
-**Live Demo:** [Streamlit Cloud Link - Add after deployment]
-
+**Live Demo:** [Streamlit Cloud Link](https://skylark-drone-ops-du2ddcn3y5lrydqja8a4dc.streamlit.app/)
 ---
 
 ## Architecture Overview
