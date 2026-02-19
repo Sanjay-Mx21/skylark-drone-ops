@@ -514,4 +514,4 @@ with tab_missions:
 # ─── FOOTER ──────────────────────────────────────────────────────────
 
 st.divider()
-st.caption("SkyOps AI v1.0 | Built for Skylark Drones | Powered by Gemini AI + Streamlit")
+st.caption("SkyOps AI v1.0 | Built for Skylark Drones | Powered by Groq (LLaMA 3.3) + Streamlit")
