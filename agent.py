@@ -55,7 +55,7 @@ def get_agent_response(api_key, user_message, data_context, chat_history=None):
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(
-            "gemini-1.5-flash-latest",
+            "gemini-2.0-flash-lite",
             system_instruction=SYSTEM_PROMPT
         )
 
