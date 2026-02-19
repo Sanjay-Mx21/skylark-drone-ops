@@ -13,7 +13,7 @@
 
 | Decision | Alternative | Why |
 |----------|------------|-----|
-| **Gemini 2.0 Flash** as AI backbone | OpenAI GPT-4, Claude API | Free tier, fast, no credit card needed — critical for a demo that evaluators can test without cost |
+| **Groq (LLaMA 3.3 70B)** as AI backbone | Google Gemini, OpenAI GPT-4, Claude API | Initially built with Gemini 2.0 Flash, but encountered persistent free-tier quota issues (limit: 0) across multiple Google Cloud projects. Switched to Groq which offers a generous free tier with LLaMA 3.3 70B — fast inference, no credit card required, and reliable API access. This decision prioritized **reliability for evaluators** over model brand. |
 | **Streamlit** for UI | React + FastAPI, Gradio | Fastest to build, deploy, and test. Built-in chat UI, data tables, and Streamlit Cloud for free hosting |
 | **Session state + CSV fallback** | Database (SQLite/Postgres) | For a demo with 4 pilots/4 drones/3 missions, in-memory state is sufficient. CSV fallback means the app works even without Sheets configured |
 | **Action blocks in AI responses** | Dedicated function calling API | Simpler to implement, more transparent to the user (they see what action is being taken), and easier to debug |
@@ -35,7 +35,7 @@ This covers the realistic scenario where a coordinator gets a call that someone 
 
 ## What I'd Do Differently With More Time
 
-1. **Real function calling**: Use Gemini's native function calling API instead of parsing action blocks from text — more reliable and structured.
+1. **Native function calling**: Use Groq's tool/function calling API instead of parsing action blocks from text — more reliable and structured.
 2. **Multi-step assignment workflow**: Add confirmation dialogs, pre-flight conflict checks before executing, and rollback capability.
 3. **Notification system**: Email/Slack alerts when conflicts are detected or urgent reassignments are needed.
 4. **Historical tracking**: Log all changes with timestamps for audit trails and analytics (e.g., "how often does P002 get reassigned?").
