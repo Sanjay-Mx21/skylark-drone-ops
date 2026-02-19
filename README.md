@@ -44,7 +44,7 @@ An AI-powered drone operations coordinator built for Skylark Drones. It manages 
 
 ### Key Design Decisions
 
-- **Gemini 2.0 Flash** for the AI backbone — free, fast, and capable enough for structured data reasoning
+- **Groq (LLaMA 3.3 70B)** for the AI backbone — free, fast inference, and highly capable for structured data reasoning. Initially tried Gemini 2.0 Flash but encountered persistent free-tier quota issues.
 - **Session state** for in-memory data management during a session, with Sheets as persistent store
 - **Action blocks** embedded in AI responses allow the chat to trigger real data mutations
 - **Graceful fallback**: App works fully with CSV files if Google Sheets isn't configured
@@ -100,7 +100,7 @@ streamlit run app.py
 | Technology | Purpose |
 |-----------|---------|
 | Streamlit | Web UI framework |
-| Google Gemini 2.0 Flash | AI conversational backbone |
+| Groq (LLaMA 3.3 70B) | AI conversational backbone |
 | gspread | Google Sheets API client |
 | pandas | Data manipulation |
 | python-dateutil | Date parsing |
